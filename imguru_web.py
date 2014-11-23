@@ -5,7 +5,7 @@ from hashids import Hashids
 hash=Hashids()
 padding=100000000
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://imguru:imguru@localhost/imgurudb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://user:pass@server/db'
 app.logger.addHandler(logging.FileHandler('/home/webdev/thekindlyone/flasklogs/imguru.log'))
 db = SQLAlchemy(app)
 class Album(db.Model):
