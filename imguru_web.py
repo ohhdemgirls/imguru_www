@@ -2,11 +2,14 @@ from flask import Flask,render_template, request, url_for, jsonify, json, redire
 from flask.ext.sqlalchemy import SQLAlchemy
 import logging
 from hashids import Hashids
+from config import Config
+confinstance=Config()
+configuration=confinstance.get_config()
 hash=Hashids()
 padding=100000000
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://user:pass@server/db'
-app.logger.addHandler(logging.FileHandler('/home/webdev/thekindlyone/flasklogs/imguru.log'))
+app.config['SQLALCHEMY_DATABASE_URI'] = configuration.get('db_uri')
+app.logger.addHandler(logging.FileHandler(configuration.get('logfile')))
 db = SQLAlchemy(app)
 class Album(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -68,7 +71,9 @@ def build_html(data):
 
 @app.route('/')
 def hello_world():
-    return 'Hello World!'
+    all_entries=Album.query.all()    
+    html=''.join([('<a href="{0}" class="list-group-item">{1}</a>'.format(url_for('show',uid=id_uid(item.id),_external=True),json.loads(item.data).get('title','No Title')))for item in all_entries])
+    return render_template('all_links.html',html=html)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
